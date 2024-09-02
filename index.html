@@ -3,10 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Embedded YouTube Video</title>
+    <title>Email Divider</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #343a40;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #007bff;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            font-size: 16px;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .output-group {
+            display: inline-block;
+            width: 160px;
+            margin: 10px;
+            padding: 15px;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+            position: relative;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        .output-group.copied {
+            background-color: #e2f7e4;
+            border-color: #c3e6cb;
+            color: #155724;
+            transform: scale(1.05);
+        }
+        .output-group.copied::after {
+            content: 'Copied';
+            font-size: 12px;
+            color: #155724;
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background-color: #c3e6cb;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .output-group:hover {
+            background-color: #f1f1f1;
+            transform: scale(1.03);
+        }
+    </style>
 </head>
 <body>
-    <h1>My YouTube Video</h1>
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/yG7HgKMpGD8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+    <h1>Email Divider</h1>
+    <textarea id="emailInput" placeholder="Paste your emails here (in 'email password' format, separated by newlines)..."></textarea>
+    <button onclick="divideEmails()">Moaz Emails Divider</button>
+
+    <div id="outputContainer"></div>
+
+    <script>
+        function divideEmails() {
+            const input = document.getElementById('emailInput').value;
+            const lines = input.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            const outputContainer = document.getElementById('outputContainer');
+            outputContainer.innerHTML = '';
+
+            let chunk = [];
+            lines.forEach((line, index) => {
+                chunk.push(line);
+                if ((index + 1) % 100 === 0 || index === lines.length - 1) {
+                    const outputGroup = document.createElement('div');
+                    outputGroup.className = 'output-group';
+                    
+                    const start = index - chunk.length + 2;
+                    const end = index + 1;
+                    outputGroup.innerText = `Group ${start}-${end}`;
+                    outputGroup.setAttribute('data-content', chunk.join('\n'));
+                    outputGroup.addEventListener('click', function() {
+                        copyToClipboard(this.getAttribute('data-content'));
+                        highlightBox(this);
+                    });
+                    
+                    outputContainer.appendChild(outputGroup);
+                    chunk = [];
+                }
+            });
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
+
+        function highlightBox(box) {
+            box.classList.add('copied');
+        }
+    </script>
+
 </body>
 </html>
